@@ -24,7 +24,7 @@ module.exports.onLoad = async function () {
     const { existsSync, readFileSync } = global.nodemodule["fs-extra"];
     const { downloadFile } = global.utils;
     const path = resolve(__dirname, 'cache', 'alime.json');
-    const url = "https://git.meewmeew.info/data/alime.json";
+    const url = "https://dev.meewmeew.info/Module-Miraiv2/data/alime.json";
 
     try {
         if (!existsSync(path)) await downloadFile(url, path);
