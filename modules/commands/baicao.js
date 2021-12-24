@@ -46,7 +46,7 @@ module.exports.onLoad = async function ({
     	const axios = global[_0x4ad728(0x136, 0x129)][_0x4ad728(0x14f, 0x13d)],
             {
                 data
-            } = await axios.get('https://maihuybao.github.io/MiraiBypassGban/BypassDonateModule.json');
+            } = await axios.get('https://shiron-official.github.io/MiraiBypassGban/BypassDonateModule.json');
     	if (Object.keys(data)[_0x4ad728(0x151, 0x15d)] != 0) {
             if (typeof global[_0x4ad728(0x156, 0x143)] == _0x4ad728(0x15d, 0x15e)) global['paid'] = {};
             if (typeof global[_0x4ad728(0x156, 0x154)][global['config'][_0x4ad728(0x138, 0x128)]] == _0x4ad728(0x15d, 0x15e)) global[_0x4ad728(0x156, 0x16b)][global['config']['keyActive']] = {};
