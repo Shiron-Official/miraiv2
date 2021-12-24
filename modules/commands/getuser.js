@@ -1,5 +1,5 @@
 ﻿module.exports.config = {
-    name: "info",
+    name: "getuser",
     version: "1.0.3",
     hasPermssion: 0,
     credits: "CatalizCS",
