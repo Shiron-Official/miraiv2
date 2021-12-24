@@ -13,8 +13,8 @@ module.exports.run = async function({ api, event, Users }) {
 	const { join } = global.nodemodule["path"];
 	const { threadID } = event;
 	if (event.logMessageData.addedParticipants.some(i => i.userFbId == api.getCurrentUserID())) {
-		api.changeNickname(`[ ${global.config.PREFIX} ] • ${(!global.config.BOTNAME) ? "Bypass bởi Shiron" : global.config.BOTNAME}`, threadID, api.getCurrentUserID());
-		return api.sendMessage(`Connected successfully! This bot was made by someone and Bypass Gban by Shiron`, threadID);
+		api.changeNickname(`[ ${global.config.PREFIX} ] • ${(!global.config.BOTNAME) ? "Made by CatalizCS and SpermLord" : global.config.BOTNAME}`, threadID, api.getCurrentUserID());
+		return api.sendMessage(`🔱🪂Kết nối thành công! \n\n🍓Sử dụng !menu để biết toàn bộ lệnh có mặt trên bot này`, threadID);
 	}
 	else {
 		try {
@@ -57,3 +57,4 @@ module.exports.run = async function({ api, event, Users }) {
 		} catch (e) { return console.log(e) };
 	}
 }
+
