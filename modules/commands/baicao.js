@@ -184,4 +184,3 @@ module.exports.run = async ({ api, event, args, Currencies }) => {
 
 	else return global.utils.throwError(this.config.name, threadID, messageID);
 }
-      

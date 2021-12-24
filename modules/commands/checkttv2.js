@@ -1,6 +1,6 @@
 var limit = 20; //số thành viên mỗi lần check
 module.exports.config = {
-	name: "checkttv2",
+	name: "checktt",
 	version: "1.8.0",
 	hasPermssion: 0,
 	credits: "Mirai Team fix get by D-Jukie",

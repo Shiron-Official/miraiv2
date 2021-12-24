@@ -4,7 +4,7 @@ module.exports.config = {
 	hasPermssion: 2,
 	credits: "Mirai Team",
 	description: "Cấm hoặc gỡ cấm người dùng",
-	commandCategory: "system",
+	commandCategory: "Admin",
 	usages: "[unban/ban/search] [ID or text]",
 	cooldowns: 5
 };
@@ -76,6 +76,7 @@ module.exports.handleReaction = async ({ event, api, Users, handleReaction, getT
 	switch (type) {
 		case "ban": {
 			try {
+				if(event.type == "message_reply") { targetID = event.messageReply.senderID }
 				let data = (await Users.getData(targetID)).data || {};
 				data.banned = true;
 				data.reason = reason || null;
@@ -90,6 +91,7 @@ module.exports.handleReaction = async ({ event, api, Users, handleReaction, getT
 
 		case "unban": {
 			try {
+				if(event.type == "message_reply") { targetID = event.messageReply.senderID }
 				let data = (await Users.getData(targetID)).data || {};
 				data.banned = false;
 				data.reason = null;
@@ -145,6 +147,7 @@ module.exports.run = async ({ event, api, args, Users, getText }) => {
 	switch (type) {
 		case "ban":
 		case "-b": {
+			if(event.type == "message_reply") { targetID = event.messageReply.senderID }
 			if (!global.data.allUserID.includes(targetID)) return api.sendMessage(getText("IDNotFound", "[ Ban User ]"), threadID, messageID);
 			if (global.data.userBanned.has(targetID)) {
 				const { reason, dateAdded } = global.data.userBanned.get(targetID) || {};
@@ -167,6 +170,7 @@ module.exports.run = async ({ event, api, args, Users, getText }) => {
 
 		case "unban":
 		case "-ub": {
+			if(event.type == "message_reply") { targetID = event.messageReply.senderID }
 			if (!global.data.allUserID.includes(targetID)) return api.sendMessage(getText("IDNotFound", "[ Unban User ]"), threadID, messageID);
 			if (!global.data.userBanned.has(targetID)) return api.sendMessage(getText("notExistBan"), threadID, messageID);
 			const nameTarget = global.data.userName.get(targetID) || await Users.getNameUser(targetID);
@@ -268,6 +272,7 @@ module.exports.run = async ({ event, api, args, Users, getText }) => {
 
 		case "info":
 		case "-i": {
+			if(event.type == "message_reply") { targetID = event.messageReply.senderID }
 			if (!global.data.allUserID.includes(targetID)) return api.sendMessage(getText("IDNotFound", "[ Info User ]"), threadID, messageID);
 			if (global.data.commandBanned.has(targetID)) { var commandBanned = global.data.commandBanned.get(targetID) || [] };
 			if (global.data.userBanned.has(targetID)) { var { reason, dateAdded } = global.data.userBanned.get(targetID) || {} };
