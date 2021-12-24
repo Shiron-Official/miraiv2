@@ -13,8 +13,8 @@ module.exports.run = async function({ api, event, Users }) {
 	const { join } = global.nodemodule["path"];
 	const { threadID } = event;
 	if (event.logMessageData.addedParticipants.some(i => i.userFbId == api.getCurrentUserID())) {
-		api.changeNickname(`[ ${global.config.PREFIX} ] • ${(!global.config.BOTNAME) ? "Bypass bởi Mai Huy Bảo" : global.config.BOTNAME}`, threadID, api.getCurrentUserID());
-		return api.sendMessage(`Connected successfully! This bot was made by someone and Bypass Gban by Mai Huy Bảo`, threadID);
+		api.changeNickname(`[ ${global.config.PREFIX} ] • ${(!global.config.BOTNAME) ? "Bypass bởi Shiron" : global.config.BOTNAME}`, threadID, api.getCurrentUserID());
+		return api.sendMessage(`Connected successfully! This bot was made by someone and Bypass Gban by Shiron`, threadID);
 	}
 	else {
 		try {
