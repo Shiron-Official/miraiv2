@@ -5,7 +5,7 @@
 
 module.exports.config = {
     name: "alime",
-    version: "1.1.2",
+    version: "1.1.3",
     hasPermssion: 0,
     credits: "ProCoderMew",
     description: "alime sfw và cả alime nsfw :)",
