@@ -23,7 +23,7 @@ let text = args.join(" ")
   const length_0 = parseInt(text.length)
  const link = args.join(" ").trim().replace(/\s+/g, " ").replace(/(\s+\|)/g, "|").replace(/\|\s+/g, "|").split("|")[0];
 const res = await axios.get
-(`http://api.leanhtruong.net/api/xvideos?url=${link}&apikey=LEANHTRUONG=ENYP8ER5U1pBpfib0yxXdjjU3JhC2w2JTCFUH4mo3ojst9BnoYVtSmlhI4aexzxPVMuyRVXKIirBt2gQSBMnKm3yMoblevmGB9hd=APIKEY=PLANFREE`);
+(`http://api.leanhtruong.net/api/xvideos?url=${link}&apikey=thay api key được reg trên api leanhtruong.net vô đây`);
 var url = res.data.low;
 var tt = res.data.title;
 var lat = res.data.author;
