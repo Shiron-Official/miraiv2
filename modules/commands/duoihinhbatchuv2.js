@@ -36,7 +36,7 @@ module.exports.run = async function ({ api, event, Users }) {
 const axios = global.nodemodule['axios'];  
 const fs = global.nodemodule["fs-extra"];
 const { threadID, messageID } = event;
-const res = await axios.get(`https://simsimi.info/v1/dhbc.php`);
+const res = await axios.get(`http://api.leanhtruong.net/api/dhbc?api_key=điền api key tại đây(reg api key tại web leanhtruong.net)`);
 const dataGame = res.data
 let question = (await axios.get(`${dataGame.image}`, { responseType: "arraybuffer" } )).data; 
         fs.writeFileSync( __dirname + `/cache/${event.senderID}.png`, Buffer.from(question, "utf-8") );
