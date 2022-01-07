@@ -8,7 +8,7 @@ module.exports.config = {
     usages: "",
     cooldowns: 5,
     envConfig: {
-        APIKEY: "ntkhang" 
+        APIKEY: "ntkhangGoatBot" 
     }
 };
 
