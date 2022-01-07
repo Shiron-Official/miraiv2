@@ -1,5 +1,5 @@
 module.exports.config = {
-    name: "videov2",
+    name: "video",
     version: "1.0.0",
     hasPermssion: 0,
     credits: "MạnhG",
@@ -8,7 +8,7 @@ module.exports.config = {
     usages: "[searchVideos]",
     cooldowns: 10,
     envConfig: {
-        "ManhG_KEY": "reg key tại web mzkapi.me"
+        "ManhG_KEY": "ĐIỀN KEY VÀO ĐÂY?(REG KEY TẠI WEB mzkapi.me)"
     }
 };
 var random = '12345ABCDE',
