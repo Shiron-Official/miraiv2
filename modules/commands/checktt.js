@@ -1,75 +1,96 @@
-module .exports .config = {
-	name: "checktt",
-	version: "1.7.0",
-	hasPermssion: 0,
-	credits: "Mirai Team fix get by D-Jukie",
-	description: "Kiểm tra lượt tương tác trong nhóm",
-	commandCategory: "Nhóm",
-	usages: "[all/tag]",
-	cooldowns: 5
+module.exports.config = {
+    name: "checktt",
+    version: "1.0.0",
+    hasPermssion: 0,
+    credits: "D-Jukie",
+    description: "Check tương tác các thành viên trong 1 nhóm",
+    commandCategory: "Nhóm",
+    usages: "[tag/reply/all/all number/all box]",
+    cooldowns: 5
 };
-
-module.exports.languages = {
-    "vi": {
-        "all": "%1. %2 với %3 tin nhắn\n",
-    },
-    "en": {
-        "all": "%1. %2 with %3 messages\n",
+module.exports.onLoad = function() {
+    const { writeFileSync, existsSync } = require('fs-extra');
+    const { resolve } = require("path");
+    const pathA = require('path');
+    const path = pathA.join(__dirname, 'cache', 'checktt.json');
+    if (!existsSync(path)) {
+        const obj = []
+        writeFileSync(path, JSON.stringify(obj, null, 4));
     }
 }
-module .exports .run = async function ({ args,Users,Threads, api, event, Currencies, getText }) {
-var mention = Object.keys(event.mentions);
-if (args[0] == "all") {
-            var { participantIDs, adminIDs } =(await Threads.getData(event.threadID)).threadInfo;   
-            //const countMess = (await Currencies.getData(event.senderID)).exp
-            const listUserID = event.participantIDs
-            var id = listUserID //[Math.floor(Math.random() * listUserID.length)];
-            var number = 1, msg = "", storage = [], exp = [];
-            for(const idUser of listUserID) {
-            const countMess = await Currencies.getData(idUser);
-            exp.push({"name" : (typeof ((await Users.getData(idUser)).name) == "undefined") ? 0 : (await Users.getData(idUser)).name, "exp": (typeof countMess.exp == "undefined") ? 0 : countMess.exp, "uid": idUser});
+module.exports.handleEvent = async({ event, Users }) => {
+    const { threadID, senderID, body } = event;
+    const fs = require("fs");
+    const pathA = require('path');
+    const thread = require('./cache/checktt.json');
+    const path = pathA.join(__dirname, 'cache', 'checktt.json');
+    if(event.isGroup == false) return;
+    if (thread.some(i => i.threadID == threadID) == false) {
+        const data = [];
+        for (let user of event.participantIDs) {
+            var name = (await Users.getData(user)).name;
+            var id = user;
+            var exp = 0;
+            if(name !== undefined && name != 'Người dùng Facebook') {
+                data.push({ name, id , exp })
+            }
         }
-           
-            exp.sort(function (a, b) { return b.exp - a.exp });
-            for (const lastData of exp)  msg += getText("all", number++, lastData.name, lastData.exp);
-
-            return api.sendMessage(`🌻Độ tương tác trong box🌻\n\n` + msg + `\n🌻Chúc mọi người tương tác vui vẻ🌻`, event.threadID);
-
+        thread.push({ threadID, data: data });
+        fs.writeFileSync(path, JSON.stringify(thread, null, 2));
+    }
+    else {
+        var threadData = thread.find(i => i.threadID == threadID && i.threadID !== undefined)
+        if (threadData.data.some(i => i.id == senderID) == false) {
+            var name = (await Users.getData(senderID)).name;
+            var id = senderID;
+            var exp = 0;
+            threadData.data.push({ name, id, exp });
+            fs.writeFileSync(path, JSON.stringify(thread, null, 2));
+        }
+        else {
+            var userData = threadData.data.find(i => i.id == senderID);
+            userData.exp = userData.exp + 1;
+            fs.writeFileSync(path, JSON.stringify(thread, null, 2));
+        }
+    }
 }
+module.exports.run = async function ({ args, api, event }) {
+    const { threadID, senderID, messageID, type, mentions } = event;
+    var mention = Object.keys(mentions);
+    const thread = require('./cache/checktt.json');
+    const data = thread.find(i => i.threadID == threadID)
+    if (args[0] == "all") {
+        var msg = "", exp = [], i = 1, count = 0
+        for(const user of data.data) {
+            exp.push({ name: user.name, exp: user.exp, id: user.id });
+        }
+        exp.sort(function (a, b) { return b.exp - a.exp });
+        for (const user of exp) { 
+            count += user.exp
+            msg += `[${i++}]: ${user.name} với ${user.exp} tin nhắn.\n`
+        }
+        return api.sendMessage(`[====KIỂM TRA TƯƠNG TÁC===]\n\n` + msg + `\nTổng số tin nhắn của nhóm là ${count}`, threadID, messageID);
+    }
     else 
-    if(event.type == "message_reply") { mention[0] = event.messageReply.senderID }
-    if (mention[0]) {
-            var { participantIDs } =(await Threads.getData(event.threadID)).threadInfo;
-            //const countMess = (await Currencies.getData(event.senderID)).exp
-            const listUserID = event.participantIDs
-            var id = listUserID //[Math.floor(Math.random() * listUserID.length)];
-            exp = [];
-            //var name = await Users.getData(id)
-            for(const idUser of listUserID) {
-            const countMess = await Currencies.getData(idUser);
-            exp.push({"name" : idUser.name, "exp": (typeof countMess.exp == "undefined") ? 0 : countMess.exp, "uid": idUser});
-        }
+        if(type == "message_reply") { mention[0] = event.messageReply.senderID }
+        if (mention[0]) {
+            var exp = [], count = 0
+            for(const user of data.data) {
+                count += user.exp
+                exp.push({ name: user.name, exp: user.exp, id: user.id });
+            }
             exp.sort(function (a, b) { return b.exp - a.exp });
-            const rank = exp.findIndex(info => parseInt(info.uid) == parseInt(mention[0])) + 1;
-            const infoUser = exp[rank - 1];
-            //const rank = exp.findIndex(info => parseInt(info.listUserID) == parseInt(event.senderID)) + 1;
-            return api.sendMessage(`🌻${(await Users.getData(mention[0])).name} đang đứng hạng ${rank} với ${infoUser.exp} tin nhắn`, event.threadID);
-}
-else {
-            var { participantIDs } =(await Threads.getData(event.threadID)).threadInfo;
-            //const countMess = (await Currencies.getData(event.senderID)).exp
-            const listUserID = event.participantIDs
-            var id = listUserID //[Math.floor(Math.random() * listUserID.length)];
-            exp = [];
-            var name = await Users.getData(id)
-            for(const idUser of listUserID) {
-            const countMess = await Currencies.getData(idUser);
-            exp.push({"name" : idUser.name, "exp": (typeof countMess.exp == "undefined") ? 0 : countMess.exp, "uid": idUser});
+            const rank = exp.findIndex(i => i.id == mention[0])
+            return api.sendMessage(`👤Tên: ${exp[rank].name}\n🏆Rank: ${rank + 1}\n💬Tin nhắn: ${exp[rank].exp}\n💹Tỉ lệ tương tác: ${(exp[rank].exp/count*100).toFixed(0)}%`, threadID, messageID);
         }
-            exp.sort(function (a, b) { return b.exp - a.exp });
-            const rank = exp.findIndex(info => parseInt(info.uid) == parseInt(event.senderID)) + 1;
-            const infoUser = exp[rank - 1];
-          
-            return api.sendMessage(`🌻Bạn đang đứng hạng ${rank} với ${infoUser.exp} tin nhắn`, event.threadID);
-}
+    else {
+        var exp = [], count = 0
+        for(const user of data.data) {
+            count += user.exp
+            exp.push({ name: user.name, exp: user.exp, id: user.id });
+        }
+        exp.sort(function (a, b) { return b.exp - a.exp });
+        const rank = exp.findIndex(i => i.id == senderID);
+        return api.sendMessage(`👤Tên: ${exp[rank].name}\n🏆Rank: ${rank + 1}\n💬Tin nhắn: ${exp[rank].exp}\n💹Tỉ lệ tương tác: ${(exp[rank].exp/count*100).toFixed(0)}%`, threadID, messageID);
+    }
 }
