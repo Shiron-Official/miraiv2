@@ -31,7 +31,7 @@ module.exports.run = async function ({
     if (moneyUser < money) api.sendMessage(`⚡️Số dư bạn không đủ ${money}$ để có thể chơi`, event.threadID, event.messageID);
     else {
     try {
-        const res = await axios.get(`https://simsimi.info/v2/taixiu.php?api_key=leanhtruong&bet=t%C3%A0i`);
+        const res = await axios.get(`http://api.leanhtruong.net/api/taixiu?api_key=ĐIỀN API KEY Ở ĐÂY?(REG API KEY TẠI WEB leanhtruong.net)`);
         var data = res.data;
         var ketqua = data.ketqua
         var ketquaGame = ketqua.slice(0, 3)
