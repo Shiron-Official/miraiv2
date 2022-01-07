@@ -8,7 +8,7 @@ module.exports.config = {
     usages: "<facebook> | <zalo> | <phone> | <momo> | <title> | <subtitle> | <titlefacebook> | <info> | [<link ảnh/reply>",
     cooldowns: 5,
     envConfig: {
-        APIKEY: "ntkhang" 
+        APIKEY: "ntkhangGoatBot" 
     }
 };
 
