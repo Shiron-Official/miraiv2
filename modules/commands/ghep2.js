@@ -1,5 +1,5 @@
 module.exports.config = {
-  name: "ghep",
+  name: "ghep2",
   version: "2.0.0", 
   hasPermssion: 0,
   credits: "D-Jukie (Xuyên get)",
