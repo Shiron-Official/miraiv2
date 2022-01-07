@@ -1,44 +1,196 @@
 module.exports.config = {
-    name: "tikvideo",
-    version: "2.0.0",
-    hasPermssion: 0,
-    credits: "D-Jukie",
-    description: "Tải video từ tiktok không logo",
-    commandCategory: "Tiện ích",
-    usages: "[url]",
-    cooldowns: 5
+  name: "tikvideo",
+  version: "1.0.0",
+  hasPermssion: 0,
+  credits: "Horizon",
+  description: "lấy video tiktok no logo",
+  commandCategory: "Penguin",
+  usages: "[url]",
+  cooldowns: 5,
 };
-module.exports.run = async function ({ api, event, args, utils  })  {
-const { APIKEY } = global.configModule.tikvideo;
-const axios = global.nodemodule['axios'];  
-const fs = global.nodemodule["fs-extra"];
-const res = await axios.get(`https://raw.githubusercontent.com/D-Jukiee/data/main/keytik.json`);
-const length_KEY = res.data.keyTik.length
-const randomAPIKEY = res.data.keyTik[Math.floor(Math.random() * length_KEY)]
 
-if (!args[0]){ return api.sendMessage("⚡Bạn phải ngập url video tiktok !!!", event.threadID, event.messageID);}
-const link = args[0]
-try {
-  const options = {
-    method: 'GET',
-    url: 'https://video-nwm.p.rapidapi.com/url/',
-    params: {url: link},
-    headers: {
-      'x-rapidapi-key': `${randomAPIKEY.API_KEY}`,
-      'x-rapidapi-host': 'video-nwm.p.rapidapi.com'
+module.exports.run = async function ({ api, event, args }) {
+  const { createReadStream, unlinkSync, writeFileSync } = require("fs-extra");
+  const axios = require("axios");
+  const { threadID, messageID } = event;
+  const request = require("request");
+  if (event.type == "message_reply") {
+    try {
+      let results = {};
+      let key = await axios.get(
+        `https://api.snaptik.site/video-key?video_url=${event.messageReply.args[0]}`,
+      );
+      key = JSON.parse(JSON.stringify(key.data, null, 2));
+      if (key.status !== "success")
+        return api.sendMessage(
+          "Link Không Tồn Tại Hoặc Sai Link , Vui Lòng Báo Admin",
+          event.threadID,
+        );
+      let data = await axios.get(
+        `https://api.snaptik.site/video-details-by-key?key=${key.data.key}`,
+      );
+      data = JSON.parse(JSON.stringify(data.data, null, 2));
+      if (data.status !== "success")
+        return api.sendMessage(
+          "Link Không Tồn Tại Hoặc Sai Link , Vui Lòng Báo Admin",
+          event.threadID,
+        );
+      results = {
+        author: data.data.author.nickname,
+        idtiktok: data.data.author.unique_id,
+        description: data.data.description,
+        video: {
+          with_watermark: `https://api.snaptik.site/download?key=${data.data.video.with_watermark}&type=video`,
+          no_watermark: `https://api.snaptik.site/download?key=${data.data.video.no_watermark}&type=video`,
+          no_watermark_raw: data.data.video.no_watermark_raw,
+        },
+        music: `https://api.snaptik.site/download?key=${data.data.music}&type=music`,
+      };
+      var path = __dirname + `/cache/tiktok.mp4`;
+      const { data: stream } = await axios.get(results.video.no_watermark, {
+        responseType: "arraybuffer",
+      });
+      writeFileSync(path, Buffer.from(stream, "utf-8"));
+      return api.sendMessage(
+        {
+          body: `Tên : ${results.author} | ID TikTok : @${
+            results.idtiktok
+          } | Nội Dung : ${results.description || "Không Có Nội Dung"}`,
+          attachment: createReadStream(path),
+        },
+        threadID,
+        () => unlinkSync(path),
+        messageID,
+      );
+    } catch (e) {
+      return api.sendMessage(
+        "Link Không Tồn Tại Hoặc Sai Link, Hoặc Video Ở Chế Độ riêng tư , Vui Lòng Báo Admin",
+        event.threadID,
+      );
     }
-    };
-    const data = await axios.request(options);
-    //const data1 = response.data
-    const link1 = data.data.item.video.playAddr[0] || data.data.item.video.playAddr
-    //api.sendMessage(`${link1}`, event.threadID);
-    path1 = __dirname+`/cache/${event.senderID}.mp4`  
-    const getms = (await axios.get(link1,{responseType: "arraybuffer"})).data; 
-      fs.writeFileSync(path1, Buffer.from(getms, "utf-8"));
-      
-    if (fs.statSync(__dirname + `/cache/${event.senderID}.mp4`).size > 26000000) return api.sendMessage('⚡Không thể gửi file vì dung lượng lớn hơn 25MB.', event.threadID, () => unlinkSync(__dirname + `/cache/${event.senderID}.mp4`), event.messageID);
-    else return api.sendMessage({body : "" , attachment: fs.createReadStream(__dirname + `/cache/${event.senderID}.mp4`)}, event.threadID, () => fs.unlinkSync(__dirname + `/cache/${event.senderID}.mp4`), event.messageID)
-} catch {
-            return api.sendMessage('⚡Không thể xử lý yêu cầu của bạn!', event.threadID, event.messageID);
-        }
-}
+  }
+  if (args.length == 0)
+    return api.sendMessage(
+      "vui lòng nhập link , kiểu : '/tiktok https://www.tiktok.com/@choul2002/video/6996459846480465179' hoặc lấy nhạc thông qua : '/tiktok music https://www.tiktok.com/@choul2002/video/6996459846480465179'",
+      event.threadID,
+      event.messageID,
+    );
+  switch (args[0]) {
+    case "music": {
+      try {
+        let results = {};
+        if (args.length == 0)
+          return api.sendMessage(
+            "vui lòng nhập link , kiểu : '/tiktok https://www.tiktok.com/@choul2002/video/6996459846480465179'",
+            event.threadID,
+            event.messageID,
+          );
+        let key = await axios.get(
+          `https://api.snaptik.site/video-key?video_url=${args[1]}`,
+        );
+        key = JSON.parse(JSON.stringify(key.data, null, 2));
+        if (key.status !== "success")
+          return api.sendMessage(
+            "Link Không Tồn Tại Hoặc Sai Link , Vui Lòng Báo Admin",
+            event.threadID,
+          );
+        let data = await axios.get(
+          `https://api.snaptik.site/video-details-by-key?key=${key.data.key}`,
+        );
+        data = JSON.parse(JSON.stringify(data.data, null, 2));
+        if (data.status !== "success")
+          return api.sendMessage(
+            "Link Không Tồn Tại Hoặc Sai Link , Vui Lòng Báo Admin",
+            event.threadID,
+          );
+        results = {
+          author: data.data.author.nickname,
+          idtiktok: data.data.author.unique_id,
+          description: data.data.description,
+          video: {
+            with_watermark: `https://api.snaptik.site/download?key=${data.data.video.with_watermark}&type=video`,
+            no_watermark: `https://api.snaptik.site/download?key=${data.data.video.no_watermark}&type=video`,
+            no_watermark_raw: data.data.video.no_watermark_raw,
+          },
+          music: `https://api.snaptik.site/download?key=${data.data.music}&type=music`,
+        };
+        var path = __dirname + `/cache/tiktok.m4a`;
+        const { data: stream } = await axios.get(results.music, {
+          responseType: "arraybuffer",
+        });
+        writeFileSync(path, Buffer.from(stream, "utf-8"));
+        return api.sendMessage(
+          {
+            body: `Tên : ${results.author} | ID TikTok : @${
+              results.idtiktok
+            } | Nội Dung : ${results.description || "Không Có Nội Dung"}`,
+            attachment: createReadStream(path),
+          },
+          threadID,
+          () => unlinkSync(path),
+          messageID,
+        );
+      } catch (e) {
+        console.log(e);
+        return api.sendMessage(
+          "Link Không Tồn Tại Hoặc Sai Link, Hoặc Video Ở Chế Độ riêng tư , Vui Lòng Báo Admin",
+          event.threadID,
+        );
+      }
+    } break;
+    default:
+      try {
+        let results = {};
+        let key = await axios.get(
+          `https://api.snaptik.site/video-key?video_url=${args[0]}`,
+        );
+        key = JSON.parse(JSON.stringify(key.data, null, 2));
+        if (key.status !== "success")
+          return api.sendMessage(
+            "Link Không Tồn Tại Hoặc Sai Link , Vui Lòng Báo Admin",
+            event.threadID,
+          );
+        let data = await axios.get(
+          `https://api.snaptik.site/video-details-by-key?key=${key.data.key}`,
+        );
+        data = JSON.parse(JSON.stringify(data.data, null, 2));
+        if (data.status !== "success")
+          return api.sendMessage(
+            "Link Không Tồn Tại Hoặc Sai Link , Vui Lòng Báo Admin",
+            event.threadID,
+          );
+        results = {
+          author: data.data.author.nickname,
+          idtiktok: data.data.author.unique_id,
+          description: data.data.description,
+          video: {
+            with_watermark: `https://api.snaptik.site/download?key=${data.data.video.with_watermark}&type=video`,
+            no_watermark: `https://api.snaptik.site/download?key=${data.data.video.no_watermark}&type=video`,
+            no_watermark_raw: data.data.video.no_watermark_raw,
+          },
+          music: `https://api.snaptik.site/download?key=${data.data.music}&type=music`,
+        };
+        var path = __dirname + `/cache/tiktok.mp4`;
+        const { data: stream } = await axios.get(results.video.no_watermark, {
+          responseType: "arraybuffer",
+        });
+        writeFileSync(path, Buffer.from(stream, "utf-8"));
+        return api.sendMessage(
+          {
+            body: `Tên : ${results.author} | ID TikTok : @${
+              results.idtiktok
+            } | Nội Dung : ${results.description || "Không Có Nội Dung"}`,
+            attachment: createReadStream(path),
+          },
+          threadID,
+          () => unlinkSync(path),
+          messageID,
+        );
+      } catch (e) {
+        return api.sendMessage(
+          "Link Không Tồn Tại Hoặc Sai Link, Hoặc Video Ở Chế Độ riêng tư , Vui Lòng Báo Admin",
+          event.threadID,
+        );
+      }
+  }
+};
