@@ -15,7 +15,7 @@ module.exports.config = {
 		"@miraipr0ject/assets": ""
 	},
 	envConfig: {
-		APIKEY: "571752207151901|AC-zG86sv6U6kpnT0_snIHBOHJc"
+		APIKEY: "6628568379%7Cc1e620fa708a1d5696fb991c1bde5662"
 	}
 };
 
