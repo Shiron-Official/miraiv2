@@ -1,1 +1,29 @@
-module.exports.config={name:"cadao",version:"1.0.0",hasPermssion:0,credits:"ManhG",description:"Ca Dao Việt Nam",commandCategory:"other",usages:"cadao",cooldowns:5},module.exports.run=async({api:a,event:e})=>{const t=require("axios"),n=require("request"),o=require("fs-extra"),r=(await t.get("https://raw.githubusercontent.com/manhkhac/mirai-1.2.8/data/json/cadaovn.json")).data.data,d=Object.values(r),s=d[Math.floor(Math.random()*d.length)],c=await t.get("https://girl.demngayyeu.repl.co");var i=c.data.data.substring(c.data.data.lastIndexOf(".")+1);n(c.data.data).pipe(o.createWriteStream(__dirname+`/cache/gaicadao.${i}`)).on("close",(function(){a.sendMessage({body:`❤️ Ca Dao Việt Nam ❤️\n\n${s} `,attachment:o.createReadStream(__dirname+`/cache/gaicadao.${i}`)},e.threadID,(()=>o.unlinkSync(__dirname+`/cache/gaicadao.${i}`)),e.messageID)}))};
+module.exports.config = {
+	name: "cadao",
+	version: "1.0.0",
+	hasPermssion: 0,
+	credits: "VanHung (TrungKien fix)",
+	description: "Ca Dao Việt Nam",
+	commandCategory: "News",
+	usages: "cadao",
+	cooldowns: 5
+};
+
+module.exports.run = async ({ api, event }) => {
+const axios = require('axios');
+const request = require('request');
+const fs = require("fs");
+const fetch = global.nodemodule["node-fetch"];
+var fetchcd = await fetch("https://raw.githubusercontent.com/Shiron-Official/apikey-DATA/main/cadao.json")
+var jsoncd =  await fetchcd.json()
+	axios.get('https://apiimg.dat2004bg.repl.co/anh').then(res => {
+    let ext = res.data.url.substring(res.data.url.lastIndexOf(".") + 1);
+	let callback = function () {
+			 api.sendMessage({
+				body: `Ca dao Việt Nam:\n﹤ ${jsoncd.data[String(Math.floor(Math.random() * 268) + 1)]} ﹥`,
+						attachment: fs.createReadStream(__dirname + `/cache/anh.${ext}`)
+					}, event.threadID, () => fs.unlinkSync(__dirname + `/cache/anh.${ext}`), event.messageID);
+				};
+				request(res.data.url).pipe(fs.createWriteStream(__dirname + `/cache/anh.${ext}`)).on("close", callback);
+			})
+}
