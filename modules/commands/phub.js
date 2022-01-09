@@ -56,7 +56,7 @@ module.exports.run = async function ({ api, event, args, Users }) {
   let pathAva = __dirname + "/cache/avt.png";
   let Avatar = (
     await axios.get(
-      `https://graph.facebook.com/${senderID}/picture?height=720&width=720&access_token=170440784240186|bc82258eaaf93ee5b9f577a8d401bfc9`,
+      `https://graph.facebook.com/${senderID}/picture?height=720&width=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`,
       { responseType: "arraybuffer" }
     )
   ).data;
